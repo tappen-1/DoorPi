@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import logging
@@ -10,7 +10,8 @@ from doorpi.action.base import SingleAction
 
 def get(parameters):
     parameter_list = parameters.split(',')
-    if len(parameter_list) is not 1: return None
+    if len(parameter_list) != 1:
+        return None
 
     time = float(parameter_list[0])
 

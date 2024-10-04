@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import logging
@@ -17,7 +17,7 @@ class SipPhoneAccountCallBack(pj.AccountCallback):
 
     sem = None
 
-    def __init__(self, account = None):
+    def __init__(self, account=None):
         logger.debug("__init__")
         pj.AccountCallback.__init__(self, account)
         DoorPi().event_handler.register_event('BeforeCallIncoming', __name__)
@@ -29,7 +29,6 @@ class SipPhoneAccountCallBack(pj.AccountCallback):
         DoorPi().event_handler.register_event('AfterCallIncoming', __name__)
         DoorPi().event_handler.register_event('OnCallReject', __name__)
         DoorPi().event_handler.register_event('AfterCallReject', __name__)
-        #DoorPi().event_handler.register_event('AfterAccountRegState', __name__)
 
     def __del__(self):
         self.destroy()
@@ -47,22 +46,13 @@ class SipPhoneAccountCallBack(pj.AccountCallback):
             if self.account.info().reg_status >= 200:
                 self.sem.release()
 
-        #DoorPi().event_handler('AfterAccountRegState', __name__)
-        #logger.debug(self.account.info.reg_status)
-
     def answer_call(self, call):
         DoorPi().sipphone.current_callcallback = CallCallback()
         call.set_callback(DoorPi().sipphone.current_callcallback)
         DoorPi().sipphone.current_call = call
-        DoorPi().sipphone.current_call.answer(code = 200)
+        DoorPi().sipphone.current_call.answer(code=200)
 
     def on_incoming_call(self, call):
-        # SIP-Status-Codes: http://de.wikipedia.org/wiki/SIP-Status-Codes
-        # 200 = OK
-        # 401 = Unauthorized
-        # 403 = Forbidden
-        # 486 = Busy Here
-        # 494 = Security Agreement Required
         logger.debug("on_incoming_call")
         logger.info("Incoming call from %s", str(call.info().remote_uri))
         DoorPi().event_handler('BeforeCallIncoming', __name__)
@@ -84,7 +74,7 @@ class SipPhoneAccountCallBack(pj.AccountCallback):
             else:
                 logger.info("Incoming and current call are different - sending busy signal to incoming call")
                 DoorPi().event_handler('OnCallBusy', __name__, {'remote_uri': call.info().remote_uri})
-                call.answer(code = 494, reason = "Security Agreement Required")
+                call.answer(code=494, reason="Security Agreement Required")
                 DoorPi().event_handler('AfterCallBusy', __name__)
                 return
 
@@ -95,8 +85,8 @@ class SipPhoneAccountCallBack(pj.AccountCallback):
             DoorPi().event_handler('AfterCallIncoming', __name__)
             return
         else:
-            logger.debug("Incoming call ist not from a trusted admin number %s -> sending busy signal", call.info().remote_uri)
+            logger.debug("Incoming call is not from a trusted admin number %s -> sending busy signal", call.info().remote_uri)
             DoorPi().event_handler('OnCallReject', __name__, {'remote_uri': call.info().remote_uri})
-            call.answer(code = 494, reason = "Security Agreement Required")
+            call.answer(code=494, reason="Security Agreement Required")
             DoorPi().event_handler('AfterCallReject', __name__)
             return

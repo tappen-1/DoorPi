@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import logging
@@ -7,28 +7,26 @@ logger.debug("%s loaded", __name__)
 
 def get(*args, **kwargs):
     try:
-        if len(kwargs['name']) == 0: kwargs['name'] = ['']
-        if len(kwargs['value']) == 0: kwargs['value'] = ['']
+        if not kwargs.get('name'):
+            kwargs['name'] = ['']
+        if not kwargs.get('value'):
+            kwargs['value'] = ['']
 
         event_handler = kwargs['DoorPiObject'].event_handler
 
         status = {}
         for name_requested in kwargs['name']:
-            if name_requested in 'sources':
+            if name_requested == 'sources':
                 status['sources'] = event_handler.sources
-            if name_requested in 'events':
+            if name_requested == 'events':
                 status['events'] = event_handler.events
-            if name_requested in 'events_by_source':
+            if name_requested == 'events_by_source':
                 status['events_by_source'] = event_handler.events_by_source
-            if name_requested in 'actions':
-                status['actions'] = {}
-                for event in event_handler.actions:
-                    status['actions'][event] = []
-                    for action in event_handler.actions[event]:
-                        status['actions'][event].append(str(action))
-            if name_requested in 'threads':
+            if name_requested == 'actions':
+                status['actions'] = {event: [str(action) for action in event_handler.actions[event]] for event in event_handler.actions}
+            if name_requested == 'threads':
                 status['threads'] = str(event_handler.threads)
-            if name_requested in 'idle':
+            if name_requested == 'idle':
                 status['idle'] = event_handler.idle
 
         return status
@@ -37,4 +35,4 @@ def get(*args, **kwargs):
         return {'Error': 'could not create '+str(__name__)+' object - '+str(exp)}
 
 def is_active(doorpi_object):
-    return True if doorpi_object.event_handler else False
+    return bool(doorpi_object.event_handler)

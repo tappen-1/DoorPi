@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import logging
@@ -22,29 +22,27 @@ def write_statusfile(filename, filecontent):
             filecontent = filecontent.replace('!DOORPI_STATUS.json_beautified!', doorpi_status_json_beautified)
             filecontent = filecontent.replace('!DOORPI_STATUS.json!', doorpi_status_json)
 
-        except:
-            logger.exception("error while creating status")
+        except Exception as e:
+            logger.exception(f"error while creating status: {e}")
 
-    except:
-        logger.warning("while action statusfile - error to get DoorPi().parse_string")
+    except Exception as e:
+        logger.warning(f"while action statusfile - error to get DoorPi().parse_string: {e}")
         return False
 
     try:
-        file = open(filename, 'w')
-        try:
+        with open(filename, 'w') as file:
             file.write(filecontent)
             file.flush()
-        finally:
-            file.close()
     except IOError as e:
-        logger.warning("while action statusfile - I/O error(%s): %s"%(e.errno, e.strerror))
+        logger.warning(f"while action statusfile - I/O error({e.errno}): {e.strerror}")
         return False
 
     return True
 
 def get(parameters):
     parameter_list = parameters.split(',')
-    if len(parameter_list) < 2: return None
+    if len(parameter_list) < 2:
+        return None
 
     filename = parameter_list[0]
     filecontent = ''.join(parameter_list[1:])

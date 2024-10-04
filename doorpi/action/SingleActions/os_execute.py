@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import logging
@@ -12,13 +12,13 @@ import doorpi
 def fire_command(command):
     return subprocess.Popen(
         command,
-        shell = True,
-        stdout = subprocess.PIPE
+        shell=True,
+        stdout=subprocess.PIPE
     ).stdout.read()
 
 def get(parameters):
     parsed_parameters = doorpi.DoorPi().parse_string(parameters)
-    return OsExecuteAction(fire_command, command = parsed_parameters)
+    return OsExecuteAction(fire_command, command=parsed_parameters)
 
 class OsExecuteAction(SingleAction):
     pass

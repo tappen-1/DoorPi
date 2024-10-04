@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import logging
@@ -12,7 +12,8 @@ def log(message):
 
 def get(parameters):
     parameter_list = parameters.split(',')
-    if len(parameter_list) is not 1: return None
+    if len(parameter_list) != 1:
+        return None
 
     message = parameter_list[0]
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import logging
@@ -6,7 +6,6 @@ logger = logging.getLogger(__name__)
 logger.debug("%s loaded", __name__)
 
 import os
-
 from doorpi import DoorPi
 from doorpi.sipphone.AbstractBaseClass import RecorderAbstractBaseClass
 
@@ -28,9 +27,8 @@ class PjsuaRecorder(RecorderAbstractBaseClass):
     def last_record_filename(self): return self.__last_record_filename
 
     def __init__(self):
-        self.__record_filename = DoorPi().config.get('DoorPi', 'records',
-                                                     '!BASEPATH!/records/%Y-%m-%d_%H-%M-%S.wav')
-        if self.__record_filename is '':
+        self.__record_filename = DoorPi().config.get('DoorPi', 'records', '!BASEPATH!/records/%Y-%m-%d_%H-%M-%S.wav')
+        if self.__record_filename == '':
             logger.debug('no recorder found in config at section DoorPi and key records')
             return
 
@@ -38,7 +36,7 @@ class PjsuaRecorder(RecorderAbstractBaseClass):
         DoorPi().event_handler.register_event('OnRecorderStopped', __name__)
         DoorPi().event_handler.register_event('OnRecorderCreated', __name__)
 
-        if DoorPi().config.get_bool('DoorPi', 'record_while_dialing', 'False') is True:
+        if DoorPi().config.get_bool('DoorPi', 'record_while_dialing', 'False'):
             DoorPi().event_handler.register_action('OnSipPhoneMakeCall', self.start)
         else:
             DoorPi().event_handler.register_action('OnCallStateConnect', self.start)
@@ -48,7 +46,7 @@ class PjsuaRecorder(RecorderAbstractBaseClass):
         DoorPi().event_handler('OnRecorderCreated', __name__)
 
     def start(self):
-        if self.__record_filename is '':
+        if self.__record_filename == '':
             return
 
         if self.__rec_id is not None:
@@ -57,10 +55,10 @@ class PjsuaRecorder(RecorderAbstractBaseClass):
 
         DoorPi().sipphone.lib.thread_register('PjsuaPlayer_start_thread')
 
-        if self.__record_filename is not '':
+        if self.__record_filename != '':
             self.__last_record_filename = DoorPi().parse_string(self.__record_filename)
             if not os.path.exists(os.path.dirname(self.__last_record_filename)):
-                logger.info('Path %s not exists - create it now', os.path.dirname(self.__last_record_filename))
+                logger.info('Path %s does not exist - creating it now', os.path.dirname(self.__last_record_filename))
                 os.makedirs(os.path.dirname(self.__last_record_filename))
 
             logger.debug('starting recording to %s', self.__last_record_filename)

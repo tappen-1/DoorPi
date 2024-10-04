@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import logging
@@ -6,7 +6,6 @@ logger = logging.getLogger(__name__)
 logger.debug("%s loaded", __name__)
 
 from time import sleep
-
 from doorpi.action.base import SingleAction
 import doorpi
 
@@ -20,25 +19,17 @@ def out_triggered(pin, start_value, end_value, timeout, stop_pin):
 
 def get(parameters):
     parameter_list = parameters.split(',')
-    if len(parameter_list) is not 4 and not 5: return None
+    if len(parameter_list) not in [4, 5]:
+        return None
 
     pin = parameter_list[0]
     start_value = parameter_list[1]
     end_value = parameter_list[2]
     timeout = float(parameter_list[3])
 
-    if len(parameters) == 5:
-        stop_pin = parameter_list[4]
-    else:
-        stop_pin = 'NoStopPinSet'
+    stop_pin = parameter_list[4] if len(parameter_list) == 5 else 'NoStopPinSet'
 
-    return OutTriggeredAction(out_triggered,
-        pin = pin,
-        start_value = start_value,
-        end_value = end_value,
-        timeout = timeout,
-        stop_pin = stop_pin
-    )
+    return OutTriggeredAction(out_triggered, pin=pin, start_value=start_value, end_value=end_value, timeout=timeout, stop_pin=stop_pin)
 
 class OutTriggeredAction(SingleAction):
     pass

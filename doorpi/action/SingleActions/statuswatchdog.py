@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import logging
@@ -12,27 +12,24 @@ def write_status_watchdog(watchdog_path, timeout):
     timeout = int(timeout)
 
     try:
-        watchdog = open(watchdog_path, "w+")
-    except:
-        logger.warning("while action write_status_watchdog - error opening watchdog file")
+        with open(watchdog_path, "w+") as watchdog:
+            watchdog.write('\n')
+            watchdog.flush()
+    except Exception as e:
+        logger.warning(f"while action write_status_watchdog - error opening watchdog file: {e}")
         return False
-
-    try:
-        watchdog.write('\n')
-        watchdog.flush()
-    finally:
-        watchdog.close()
 
     return True
 
 def get(parameters):
     parameter_list = parameters.split(',')
-    if len(parameter_list) is not 1 and len(parameter_list) is not 2: return None
+    if len(parameter_list) not in [1, 2]:
+        return None
 
     watchdog = parameter_list[0]
     timeout = 5
 
-    if len(parameter_list) is 2:
+    if len(parameter_list) == 2:
         timeout = int(parameter_list[1])
 
     return SleepAction(write_status_watchdog, watchdog, timeout)

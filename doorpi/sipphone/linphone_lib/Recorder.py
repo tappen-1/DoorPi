@@ -1,14 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import logging
-logger = logging.getLogger(__name__)
-logger.debug("%s loaded", __name__)
-
 import os
-
 from doorpi import DoorPi
 from doorpi.sipphone.AbstractBaseClass import RecorderAbstractBaseClass, SIPPHONE_SECTION
+
+logger = logging.getLogger(__name__)
+logger.debug("%s loaded", __name__)
 
 class LinphoneRecorder(RecorderAbstractBaseClass):
 
@@ -29,9 +28,8 @@ class LinphoneRecorder(RecorderAbstractBaseClass):
         return self.__last_record_filename
 
     def __init__(self):
-        self.__record_filename = DoorPi().config.get(SIPPHONE_SECTION, 'records',
-                                                     '!BASEPATH!/records/%Y-%m-%d_%H-%M-%S.wav')
-        if self.__record_filename is '':
+        self.__record_filename = DoorPi().config.get(SIPPHONE_SECTION, 'records', '!BASEPATH!/records/%Y-%m-%d_%H-%M-%S.wav')
+        if self.__record_filename == '':
             logger.debug('no recorder found in config at section DoorPi and key records')
             return
 
@@ -51,10 +49,10 @@ class LinphoneRecorder(RecorderAbstractBaseClass):
         DoorPi().event_handler('OnRecorderCreated', __name__)
 
     def start(self):
-        if self.__record_filename is '':
+        if self.__record_filename == '':
             return
 
-        if self.__record_filename is not '':
+        if self.__record_filename != '':
             if not os.path.exists(os.path.dirname(self.__last_record_filename)):
                 logger.info('Path %s does not exist - creating it now', os.path.dirname(self.__last_record_filename))
                 os.makedirs(os.path.dirname(self.__last_record_filename))

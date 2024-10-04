@@ -1,12 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import logging
 logger = logging.getLogger(__name__)
 logger.debug("%s loaded", __name__)
 
-from BaseHTTPServer import HTTPServer
-from SocketServer import ThreadingMixIn
+from http.server import HTTPServer  # `BaseHTTPServer` wurde in Python 3 zu `http.server` geändert
+from socketserver import ThreadingMixIn  # `SocketServer` wurde zu `socketserver` geändert
 
 from random import randrange
 
@@ -73,6 +73,7 @@ def check_config(config):
     for group in groups:
         users_in_group = config.get_list('Group', group)
         for user_in_group in users_in_group:
+           
             if user_in_group not in users:
                 warnings.append("user %s is assigned to group %s but doesn't exist as user" % (user_in_group, group))
 
@@ -81,20 +82,24 @@ def check_config(config):
     for group in groups_with_write_permissions:
         modules = config.get_list('WritePermission', group)
         for module in modules:
-            if CONF_AREA_PREFIX+module not in config_section:
+            if CONF_AREA_PREFIX + module not in config_section:
                 warnings.append("module %s doesn't exist but is assigned to group %s in WritePermission" % (module, group))
 
     for group in groups_with_read_permissions:
         modules = config.get_list('ReadPermission', group)
         for module in modules:
-            if CONF_AREA_PREFIX+module not in config_section:
+            if CONF_AREA_PREFIX + module not in config_section:
                 warnings.append("module %s doesn't exist but is assigned to group %s in ReadPermission" % (module, group))
 
-    for info in infos: logger.info(info)
-    for warning in warnings: logger.error(warning)
-    for error in errors: logger.error(error)
+    for info in infos:
+        logger.info(info)
+    for warning in warnings:
+        logger.warning(warning)
+    for error in errors:
+        logger.error(error)
 
     return {'infos': infos, 'warnings': warnings, 'errors': errors}
+
 
 class DoorPiWeb(ThreadingMixIn, HTTPServer):
     keep_running = True
@@ -107,16 +112,18 @@ class DoorPiWeb(ThreadingMixIn, HTTPServer):
     online_fallback = None
 
     @property
-    def config_status(self): return check_config(self.config)
+    def config_status(self):
+        return check_config(self.config)
 
     @property
     def own_url(self):
-        if self.server_port is 80:
-            return "http://%s/"%self.server_name
+        if self.server_port == 80:
+            return "http://%s/" % self.server_name
         else:
-            return "http://%s:%s/"%(self.server_name, self.server_port)
+            return "http://%s:%s/" % (self.server_name, self.server_port)
 
-    def inform_own_url(self): logger.info('DoorPiWeb URL is %s', self.own_url)
+    def inform_own_url(self):
+        logger.info('DoorPiWeb URL is %s', self.own_url)
 
     @property
     def sessions(self):
@@ -127,7 +134,8 @@ class DoorPiWeb(ThreadingMixIn, HTTPServer):
     _session_handler = None
 
     @property
-    def config(self): return doorpi.DoorPi().config
+    def config(self):
+        return doorpi.DoorPi().config
 
     def start(self):
         doorpi.DoorPi().event_handler.register_event('OnWebServerStart', __name__)
@@ -137,7 +145,6 @@ class DoorPiWeb(ThreadingMixIn, HTTPServer):
         self.indexfile = doorpi.DoorPi().config.get_string_parsed(DOORPIWEB_SECTION, 'indexfile', 'index.html')
         self.loginfile = doorpi.DoorPi().config.get_string_parsed(DOORPIWEB_SECTION, 'loginfile', 'login.html')
         self.area_public_name = doorpi.DoorPi().config.get_string_parsed(DOORPIWEB_SECTION, 'public', 'AREA_public')
-        # https://raw.githubusercontent.com/motom001/DoorPiWeb/master/ or http://motom001.github.io/DoorPiWeb/
         self.online_fallback = doorpi.DoorPi().config.get_string_parsed(DOORPIWEB_SECTION, 'online_fallback', 'http://motom001.github.io/DoorPiWeb')
         check_config(self.config)
 
@@ -149,18 +156,21 @@ class DoorPiWeb(ThreadingMixIn, HTTPServer):
         return self
 
     def handle_while_not_shutdown(self):
-        while self.keep_running: self.handle_request()
+        while self.keep_running:
+            self.handle_request()
 
     def fake_request(self):
         try:
-            from urllib2 import urlopen as fake_request
-            fake_request("http://%s:%s/"%(self.server_name, self.server_port), timeout = 0)
-        except: pass
+            from urllib.request import urlopen as fake_request  # urllib2 wurde in Python 3 zu urllib.request geändert
+            fake_request("http://%s:%s/" % (self.server_name, self.server_port), timeout=0)
+        except:
+            pass
 
     def init_shutdown(self):
         doorpi.DoorPi().event_handler('OnWebServerStop', __name__)
         self.keep_running = False
-        if self.sessions: self.sessions.destroy()
+        if self.sessions:
+            self.sessions.destroy()
         DoorPiWebRequestHandler.destroy()
         self.fake_request()
         doorpi.DoorPi().event_handler.unregister_source(__name__, True)

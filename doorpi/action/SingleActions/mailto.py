@@ -1,22 +1,21 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import logging
 logger = logging.getLogger(__name__)
 logger.debug("%s loaded", __name__)
 
-import smtplib # used by: fire_action_mail
-from email.mime.multipart import MIMEMultipart # used by: fire_action_mail
-from email.mime.text import MIMEText # used by: fire_action_mail
-from email.MIMEBase import MIMEBase # used by: fire_action_mail
-from email import Encoders # used by: fire_action_mail
-from email.Utils import COMMASPACE # used by: fire_action_mail
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
+from email.utils import COMMASPACE
 
 from doorpi.action.base import SingleAction
 import doorpi
 import os
 from take_snapshot import get_last_snapshot
-import subprocess as sub
 
 def fire_action_mail(smtp_to, smtp_subject, smtp_text, smtp_snapshot):
     try:
@@ -60,41 +59,35 @@ def fire_action_mail(smtp_to, smtp_subject, smtp_text, smtp_snapshot):
 
         try:
             with open(smtp_snapshot, "rb") as snapshot_file:
-                part = MIMEBase('application',"octet-stream")
+                part = MIMEBase('application', "octet-stream")
                 part.set_payload(snapshot_file.read())
-                Encoders.encode_base64(part)
+                encoders.encode_base64(part)
                 part.add_header(
                     'Content-Disposition',
-                    'attachment; filename="%s"' % os.path.basename(smtp_snapshot))
+                    f'attachment; filename="{os.path.basename(smtp_snapshot)}"')
                 msg.attach(part)
         except Exception as exp:
-            logger.exception("send not attachment for this mail: %s" % exp)
+            logger.exception(f"send not attachment for this mail: {exp}")
 
         server.sendmail(smtp_from, smtp_tolist, msg.as_string())
         server.quit()
-    except:
-        logger.exception("couldn't send email")
+    except Exception as e:
+        logger.exception(f"couldn't send email: {e}")
         return False
     return True
 
 
 def get(parameters):
     parameter_list = parameters.split(',')
-    if len(parameter_list) < 3 or len(parameter_list) > 4: return None
+    if len(parameter_list) < 3 or len(parameter_list) > 4:
+        return None
 
     smtp_to = parameter_list[0]
     smtp_subject = parameter_list[1]
     smtp_text = parameter_list[2]
-    if (len(parameter_list) == 4):
-        smtp_snapshot = parameter_list[3]
-    else:
-        smtp_snapshot = False
-    
-    return MailtoAction(fire_action_mail,
-                     smtp_to = smtp_to,
-                     smtp_subject = smtp_subject,
-                     smtp_text = smtp_text,
-                     smtp_snapshot = smtp_snapshot)
+    smtp_snapshot = parameter_list[3] if len(parameter_list) == 4 else False
+
+    return MailtoAction(fire_action_mail, smtp_to=smtp_to, smtp_subject=smtp_subject, smtp_text=smtp_text, smtp_snapshot=smtp_snapshot)
 
 
 class MailtoAction(SingleAction):

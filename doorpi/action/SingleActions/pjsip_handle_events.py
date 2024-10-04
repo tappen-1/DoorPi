@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import logging
@@ -13,11 +13,12 @@ def pjsip_handle_events(timeout):
 
 def get(parameters):
     parameter_list = parameters.split(',')
-    if len(parameter_list) is not 1: return None
+    if len(parameter_list) != 1:
+        return None
 
     timeout = int(parameter_list[0])
 
-    return PjsipHandleEventsAction(pjsip_handle_events, timeout = timeout)
+    return PjsipHandleEventsAction(pjsip_handle_events, timeout=timeout)
 
 class PjsipHandleEventsAction(SingleAction):
     pass

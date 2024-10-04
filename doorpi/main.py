@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 import argparse
@@ -34,9 +34,8 @@ def init_logger(arguments):
     if '--trace' in arguments: log_level = TRACE_LEVEL
 
     logging.basicConfig(
-        level = log_level,
-        format = LOG_FORMAT
-    #    datefmt = '%m/%d/%Y %I:%M:%S %p'
+        level=log_level,
+        format=LOG_FORMAT
     )
 
     return logging.getLogger(__name__)
@@ -47,13 +46,13 @@ def parse_arguments(argv):
         prog=argv[0],
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=metadata.description,
-        epilog = metadata.epilog
+        epilog=metadata.epilog
     )
 
     arg_parser.add_argument(
         '-V', '--version',
         action='version',
-        version='{0} {1}'.format(metadata.project, metadata.version)
+        version=f'{metadata.project} {metadata.version}'
     )
     arg_parser.add_argument('--debug', action="store_true")
     arg_parser.add_argument('--trace', action="store_true")
@@ -91,12 +90,12 @@ def files_preserve_by_path(*paths):
             return False
 
     fd_max = getrlimit(RLIMIT_NOFILE)[1]
-    return [fd for fd in xrange(fd_max) if fd_wanted(fd)]
+    return [fd for fd in range(fd_max) if fd_wanted(fd)]
 
 
 def main_as_daemon(argv):
-    if argv[1] is 'reload':
-        print('not implemeted yet - use restart instead')
+    if argv[1] == 'reload':
+        print('not implemented yet - use restart instead')
         return 1
     if argv[1] in ['stop']:
         parsed_arguments = None
@@ -131,13 +130,13 @@ def main_as_daemon(argv):
     try:
         daemon_runner.do_action()
     except DaemonRunnerStopFailureError as ex:
-        print("can't stop DoorPi daemon - maybe it's not running? (Message: %s)" % ex)
+        print(f"can't stop DoorPi daemon - maybe it's not running? (Message: {ex})")
         return 1
     except DaemonRunnerStartFailureError as ex:
-        print("can't start DoorPi daemon - maybe it's running already? (Message: %s)" % ex)
+        print(f"can't start DoorPi daemon - maybe it's running already? (Message: {ex})")
         return 1
     except Exception as ex:
-        print("Exception NameError: %s" % ex)
+        print(f"Exception NameError: {ex}")
     finally:
         doorpi.DoorPi().destroy()
     return 0
@@ -149,10 +148,14 @@ def main_as_application(argv):
     logger.info(metadata.epilog)
     logger.debug('loaded with arguments: %s', str(argv))
 
-    try:                        doorpi.DoorPi(parsed_arguments).run()
-    except KeyboardInterrupt:   logger.info("KeyboardInterrupt -> DoorPi will shutdown")
-    except Exception as ex:     logger.exception("Exception NameError: %s", ex)
-    finally:                    doorpi.DoorPi().destroy()
+    try:
+        doorpi.DoorPi(parsed_arguments).run()
+    except KeyboardInterrupt:
+        logger.info("KeyboardInterrupt -> DoorPi will shutdown")
+    except Exception as ex:
+        logger.exception(f"Exception NameError: {ex}")
+    finally:
+        doorpi.DoorPi().destroy()
 
     return 0
 
@@ -167,6 +170,7 @@ def entry_point():
         raise SystemExit(main_as_daemon(sys.argv))
     else:
         raise SystemExit(main_as_application(sys.argv))
+
 
 if __name__ == '__main__':
     entry_point()
