@@ -79,8 +79,8 @@ def time_tick(last_tick):
         else: 
             doorpi.DoorPi().event_handler('OnTimeSecondUnevenNumber', __name__)
 
-    global last_time_tick_second
     last_time_tick_second = timestamp_now
+    global last_time_tick_second
 
     return True
 

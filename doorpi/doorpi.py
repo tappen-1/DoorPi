@@ -255,7 +255,7 @@ class DoorPi(metaclass=Singleton):  # Python 3 Syntax für Metaklassen
 
         infos_as_html = '<table>'
         for key in self.additional_informations.keys():
-            infos_as_html += f'<tr><td><b>{key}</b></td><td><i>{html.escape(str(self.additional_informations.get(key)).replace("\r\n", "<br />"))}</i></td></tr>'
+            infos_as_html += '<tr><td><b>{}</b></td><td><i>{}</i></td></tr>'.format(key, html.escape(str(self.additional_informations.get(key)).replace("\r\n", "<br />")))
         infos_as_html += '</table>'
 
         mapping_table = {
