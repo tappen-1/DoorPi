@@ -53,14 +53,13 @@ install_reqs = parse_requirements(os.path.join(base_path, 'requirements.txt'), s
 reqs = [str(req.requirement) for req in install_reqs]  # Changed 'req' to 'requirement' for pip compatibility
 
 setup_dict = dict(
-    # <http://pythonhosted.org/setuptools/setuptools.html>
     license=metadata.license,
     name=metadata.package,
     version=metadata.version,
     author=metadata.authors[0],
-    author_email=metadata.emails[0],
+    author_email=metadata.authors_emails[0],  # Korrigiert auf 'authors_emails'
     maintainer=metadata.authors[0],
-    maintainer_email=metadata.emails[0],
+    maintainer_email=metadata.authors_emails[0],  # Korrigiert auf 'authors_emails'
     url=metadata.url,
     keywords=metadata.keywords,
     description=metadata.description,
@@ -77,19 +76,13 @@ setup_dict = dict(
         'Natural Language :: English',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
-        'Topic :: Documentation',
-        'Topic :: Software Development :: Libraries :: Python Modules',
-        'Topic :: System :: Installation/Setup',
-        'Topic :: System :: Software Distribution',
         'Topic :: Communications :: Internet Phone',
         'Topic :: Communications :: Telephony',
         'Topic :: Multimedia :: Sound/Audio :: Capture/Recording',
         'Topic :: Multimedia :: Video :: Capture',
-        'Topic :: Multimedia :: Video :: Conversion',
         'Topic :: Security',
-        'Topic :: System :: Emulators',
-        'Topic :: System :: Filesystems',
-        'Topic :: System :: Hardware',
+        'Topic :: System :: Installation/Setup',
+        'Topic :: System :: Software Distribution',
         'Topic :: Utilities'
     ],
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
@@ -103,6 +96,7 @@ setup_dict = dict(
         ]
     }
 )
+
 
 def main():
     try:
