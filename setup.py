@@ -117,7 +117,7 @@ def main():
             with open(metadata.daemon_file, "w") as daemon_file:
                 for line in urllib2.urlopen(metadata.daemon_online_template):
                     daemon_file.write(parse_string(line))
-            os.chmod(metadata.daemon_file, 0755)
+            os.chmod(metadata.daemon_file, 0o755)
     except: pass
 
     setup(**setup_dict)
