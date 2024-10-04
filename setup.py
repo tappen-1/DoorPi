@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import imp
 import os
 import uuid
 import sys
-import urllib2
+import urllib.request
+import importlib
 
 # Check for pip, setuptools and wheel
 try:
