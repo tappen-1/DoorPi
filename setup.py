@@ -26,7 +26,10 @@ except ImportError as exp:
             sys.exit(e.code)
 
 base_path = os.path.dirname(os.path.abspath(__file__))
-metadata = imp.load_source('metadata', os.path.join(base_path, 'doorpi', 'metadata.py'))
+spec = importlib.util.spec_from_file_location('metadata', os.path.join(base_path, 'doorpi', 'metadata.py'))
+metadata = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(metadata)
+
 
 
 def parse_string(raw_string):
