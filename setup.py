@@ -30,14 +30,11 @@ spec = importlib.util.spec_from_file_location('metadata', os.path.join(base_path
 metadata = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(metadata)
 
-
-
 def parse_string(raw_string):
     for meta_key in dir(metadata):
         if not meta_key.startswith('__'):
             raw_string = raw_string.replace('!!%s!!' % meta_key,  str(getattr(metadata, meta_key)))
     return raw_string
-
 
 def read(filename, parse_file_content=False, new_filename=None):
     with open(os.path.join(base_path, filename)) as f:
@@ -50,11 +47,10 @@ def read(filename, parse_file_content=False, new_filename=None):
         return new_filename
     return file_content
 
-
 from setuptools import setup, find_packages
 from pip._internal.req import parse_requirements
 install_reqs = parse_requirements(os.path.join(base_path, 'requirements.txt'), session=uuid.uuid1())
-reqs = [str(req.req) for req in install_reqs]
+reqs = [str(req.requirement) for req in install_reqs]  # Changed 'req' to 'requirement' for pip compatibility
 
 setup_dict = dict(
     # <http://pythonhosted.org/setuptools/setuptools.html>
@@ -69,8 +65,6 @@ setup_dict = dict(
     keywords=metadata.keywords,
     description=metadata.description,
     long_description=read('README.rst'),
-    # Find a list of classifiers here:
-    # <http://pypi.python.org/pypi?%3Aaction=list_classifiers>
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
@@ -82,9 +76,7 @@ setup_dict = dict(
         'Natural Language :: German',
         'Natural Language :: English',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.7',
-        # 'Programming Language :: Python :: 3.3',
-        # 'Programming Language :: Python :: Implementation :: PyPy',
+        'Programming Language :: Python :: 3',
         'Topic :: Documentation',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: System :: Installation/Setup',
@@ -112,14 +104,13 @@ setup_dict = dict(
     }
 )
 
-
 def main():
     try:
         if os.name == 'posix' and os.geteuid() == 0 and \
                 not os.path.isfile(metadata.daemon_file) and not os.path.exists(metadata.daemon_file):
             with open(metadata.daemon_file, "w") as daemon_file:
-                for line in urllib2.urlopen(metadata.daemon_online_template):
-                    daemon_file.write(parse_string(line))
+                for line in urllib.request.urlopen(metadata.daemon_online_template):  # urllib2 -> urllib.request
+                    daemon_file.write(parse_string(line.decode('utf-8')))  # Python 3 requires decode
             os.chmod(metadata.daemon_file, 0o755)
     except: pass
 
